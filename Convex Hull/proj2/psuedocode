@@ -1,0 +1,145 @@
+
+# Total time complexity of algorith: O(nlogn)
+  We are diving each hull into two parts each of n/2 size, and the work done
+  at any given leaf is O(n). Therefore, according to the master theorem, where a=2, b=2, and d=1
+  the geometric sequence (a/b^d)=1, and O(nlogn).
+
+1. Hull class which holds an array of points, which are in clock-wise orders,
+   a right-most and left-most point, and two function definitions which give return next point
+   in either clockwise or counter-clockwise order.
+ class Hull(array of points):
+    default constructor(points): O(1)
+        this.points = points
+        this.leftPoint = calculate point with lowest x value
+        this.rightPoint = calculate point with highest x value
+
+    def clockwise(point): O(1)
+        if index of point == last point:
+            return first point
+        else:
+            return next point
+
+    def counterClockwise(point): O(1)
+        if index of point == first point:
+            return last point
+        else:
+            return previous point
+
+2. Simple function definition to return slope between two points
+ slope(point1, point2): (each point is a QpointF with x and y properties) O(1)
+    return (y1 - y2) / (x1 - x2)
+
+3. function to determine if we need to merge or if we have reached a leaf (3 or less points in an array)
+ createHull(array of points) O(1)
+    if num points <= 3:
+        createOrderedHull(points)
+    else:
+        merge(first half of points, second half of points)
+
+4. function to create an ordered array with points in clockwise order. Should only receive 3 or less points
+ createOrderedHull(array of points): O(1)
+    if num points < 3:
+        return Hull(points)
+    if num points == 3:
+        if slope(points[0], points[1]) > slope(points[0], points[2]):
+            return Hull(points)
+        else:
+            return Hull([points[0], points[2], points[1])
+    else:
+        throw error (there shouldn't be more than 3 points in this method)
+
+5. function to merge two hulls. First we find the top and bottom tangent points, then we create a new hull
+   based on the points, effectively ignoring all points that lie between the top and bottom tangents on each
+   hull, and connecting the top of each and the bottom of each hull.
+ mergeHulls(hull1, hull2):
+    point1 = rightmost of hull1
+    point2 = leftmost of hull2
+
+    compareSlope = slope(point1, point2)
+    topPoint1 = point1
+    topPoint2 = point2
+    solved = false
+
+    # time complexity for finding topPoints
+    # worst case: O(n + n) -> O(n)
+    # best case: O(1 + 1) -> O(1)
+    # average case : O(n)
+
+    while solved is false: O(n)
+        solved = true
+        while slope(next point ccw to topPoint1, topPoint2) < compareSlope:
+            topPoint1 = next point in ccw order
+            compareSlope = slope(topPoint1, topPoint2)
+            solved = false
+        while slope(topPoint1, next point cw to topPoint2) > compareSlope:
+            topPoint2 = next point in cw order
+            compareSlope = slope(topPoint1, topPoint2)
+            solved = false
+
+    # time complexity for finding bottomPoints
+    # worst case: O(n + n) -> O(n)
+    # best case: O(1 + 1) -> O(1)
+    # average case : O(n)
+
+    bottomPoint1 = point1
+    bottomPoint2 = point2
+    compareSlope = slope(point1, point2)
+    solved = false
+
+    while not solved: O(n)
+        solved = true
+        while slope(next point cw to bottomPoint1, bottomPoint2) > compareSlope:
+            bottomPoint1 = next point in cw order
+            compareSlope = slope(bottomPoint1, bottomPoint2)
+            solved = false
+        while slope(bottomPoint1, next point ccw to bottomPoint2) < compareSlope:
+            bottomPoint2 = next point in ccw order
+            compareSlope = slope(bottomPoint1, bottomPoint2)
+            solved = false
+
+    initialize final points array = []
+       # all increments here will be done in clockwise order
+
+    # time complexity for adding final hull points
+    # worst case: O(n + n) -> O(n)
+    # best case: O(1 + 1) -> O(1)
+    # average case: O(n)
+
+    while True:
+        final.append(current)
+        if current == topPoint1:
+            break
+        else:
+            increment current
+
+    current = topPoint2
+    while True:
+        final.append(current)
+        if current == right point of hull2:
+            break
+        else:
+            increment current
+
+    current = right most point of hull2
+    while True:
+        if current == bottomPoint2:
+            break
+        else:
+            increment current
+            final.append(current)
+
+    current = bottomPoint1
+    while True:
+        if current == left point of hull1:
+            break
+        else:
+            final.append(current)
+            increment current
+
+    return Hull(final)
+
+ solveHull(array of points):
+    sortByX(points) # sort points by increasing x-value
+    createHull(points)
+
+
